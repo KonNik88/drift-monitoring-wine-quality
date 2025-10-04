@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+dist/
+build/
+
+# Envs
+.venv/
+venv/
+env/
+.env
+*.env
+
+# Jupyter
+.ipynb_checkpoints/
+*.nbconvert.ipynb
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Reports / artifacts (keep HTML/MD/PNG if you want to commit them)
+reports/*.csv
+reports/*.json
+reports/figures/*.csv
+reports/figures/*.json
+# Uncomment to ignore heavy HTML:
+# reports/*.html
