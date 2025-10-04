@@ -1,6 +1,6 @@
 # ML Monitoring Template — Wine Quality (Red)
 
-A portfolio-ready Jupyter notebook that demonstrates **production-style monitoring** for a regression model using the UCI **Wine Quality (red)** dataset.  
+A portfolio‑ready Jupyter notebook that demonstrates **production‑style monitoring** for a regression model on the UCI **Wine Quality (red)** dataset.  
 It goes beyond default presets and combines **data/target/prediction drift** checks with **adversarial validation**, **PSI/JS effect sizes**, **SHAP/PDP explanations**, **slice analysis**, and a concrete **Alert Policy**.
 
 > Verdict on sample run: **MAJOR_DRIFT** (multiple independent signals cross thresholds).
@@ -20,6 +20,14 @@ It goes beyond default presets and combines **data/target/prediction drift** che
   - **Residuals QC**: QQ‑plot/ECDF (optional cell).
 - **Alert Policy** with explicit thresholds and **runbook actions**.
 - **Artifacts** saved to `reports/`: HTML (Evidently), PNG (figures), CSV/JSON summaries, `SUMMARY.md` and `final_summary.md`.
+
+## Results at a glance (sample run)
+- **PSI‑share (>0.2)**: **0.55**
+- **JS‑share (>0.1)**: **0.18**
+- **Adversarial AUC**: **0.736**
+- **Mean |Δcorr| (top‑3 pairs)**: **0.232**
+- **Slice ΔMAE% bins ≥ 20**: **8**
+- **Verdict**: **MAJOR_DRIFT**
 
 ## Quick start
 ```bash
@@ -49,6 +57,33 @@ jupyter lab quality_monitoring_notebook.ipynb
 
 **Recommended actions:** re‑train on latest data (rolling window or full retrain), check sources for unstable features (e.g., `density`, `fixed acidity`), enable PSI/slice alerts, optionally apply **importance reweighting** as a quick stabilizer.
 
+## API quirks & caveats (Evidently 0.7.12 legacy)
+- **Explicit `column_mapping` is a must.** Auto‑detection may misclassify columns when new fields/renames appear.
+  ```python
+  from types import SimpleNamespace
+  column_mapping = SimpleNamespace(
+      target="quality",
+      prediction="y_pred",
+      numerical_features=[...],   # list of features
+      categorical_features=[],
+  )
+  report.run(reference_data=ref, current_data=cur, column_mapping=column_mapping)
+  ```
+- **Legacy imports.** Use `evidently.legacy.report import Report` and `evidently.legacy.metric_preset`. API changed in ≥0.8.
+- **RegressionPreset expects predictions.** Ensure `y_pred` exists in `*_pred` DataFrames (preds computed by the model).
+- **Numerical stability for effect sizes.** Add a small `eps` (e.g., `1e-12`) to probabilities in **JS/Hellinger**; **PSI** uses quantile binning.
+- **Adversarial validation.** `Pipeline(StandardScaler, LogisticRegression)` with stratification; AUC + feature importances are used as an aggregated drift signal.
+- **SHAP on a sample.** Sample ~500 rows per period for speed; TreeExplainer for tree models.
+- **Corr drift with the same color scale.** Heatmaps compared on `[-1, 1]` for honest “before/after” visuals.
+- **Data Quality first.** Check for missing/constant columns and duplicates (we observed ~15% stable duplicates in both splits) to avoid mistaking DQ issues for drift.
+- **Determinism.** Fix `random_state` in RF, CV splits, and SHAP sampling.
+- **Paths/OS.** Notebook uses Windows paths in examples; prefer `pathlib.Path` for portability.
+
+## Why Evidently *and* Grafana/Prometheus?
+**Evidently** computes ML‑specific metrics/reports (drift, PSI/JS, explanations).  
+**Prometheus/Grafana** store and visualize time‑series metrics & alerts.  
+Typical production flow: compute metrics in Python → push numbers to Prometheus → Grafana dashboards; keep Evidently HTML for deep‑dive incident reviews.
+
 ## Files
 - `quality_monitoring_notebook.ipynb` — the full monitoring notebook.
 - `env/requirements.txt` — pinned deps.
@@ -58,5 +93,5 @@ jupyter lab quality_monitoring_notebook.ipynb
 ## Dataset
 UCI Machine Learning Repository — Wine Quality (red).
 
-## Badges / topics you can add on GitHub
+## Badges / topics (GitHub)
 `ml-monitoring`, `data-drift`, `model-drift`, `evidently`, `shap`, `psi`, `pdp`, `wine-quality`, `portfolio-project`
