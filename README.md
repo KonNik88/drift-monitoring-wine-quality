@@ -1,4 +1,12 @@
 # ML Monitoring Template — Wine Quality (Red)
+<!-- Badges -->
+![Python](https://img.shields.io/badge/python-3.9%2B-blue)
+![Jupyter](https://img.shields.io/badge/Jupyter-Notebook-orange)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-1.3%2B-brightgreen)
+![Evidently](https://img.shields.io/badge/Evidently-0.7.x-ff69b4)
+![SHAP](https://img.shields.io/badge/SHAP-0.40%2B-informational)
+![Status](https://img.shields.io/badge/status-stable-success)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 A portfolio‑ready Jupyter notebook that demonstrates **production‑style monitoring** for a regression model on the UCI **Wine Quality (red)** dataset.  
 It goes beyond default presets and combines **data/target/prediction drift** checks with **adversarial validation**, **PSI/JS effect sizes**, **SHAP/PDP explanations**, **slice analysis**, and a concrete **Alert Policy**.
